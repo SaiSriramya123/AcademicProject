@@ -1,0 +1,14 @@
+# React
+frontend/node_modules/
+frontend/build/
+ 
+# ASP.NET
+backend/bin/
+backend/obj/
+ 
+# Logs
+*.log
+ 
+# OS
+.DS_Store
+Thumbs.db
