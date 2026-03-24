@@ -18,7 +18,7 @@ namespace EduTrackAcademics.Controllers
 			_service = service;
 		}
 
-		//[Authorize(Roles = "Coordinator,Admin")]
+		[Authorize(Roles = "Coordinator,Admin")]
 
 		[HttpGet("programs")]
 		public IActionResult GetPrograms()
