@@ -17,6 +17,19 @@ namespace EduTrackAcademics.Repository
 				.AsNoTracking()
 				.AnyAsync(s => s.StudentId == studentId);
 		}
+		public async Task<List<StudentDTO>> GetAllStudentsAsync()
+		{
+
+			var student = await _context.Student.ToListAsync();
+			return student.Select(p => new StudentDTO
+			{
+				StudentName = p.StudentName,
+				StudentEmail = p.StudentEmail,
+				StudentPhone = p.StudentPhone,
+				StudentGender = p.StudentGender
+			}).ToList();
+		}
+
 		public async Task<StudentDTO> GetPersonalInfoAsync(string studentId)
 		{
 			return await _context.Student
@@ -75,22 +88,6 @@ namespace EduTrackAcademics.Repository
 			}
 			await _context.SaveChangesAsync();
 		}
-		public async Task<StudentDashboardDTO?> GetStudentDetailsAsync(string studentId)
-		{
-			return await _context.Student
-				.Where(s => s.StudentId == studentId)
-				.Select(s => new StudentDashboardDTO
-				{
-					StudentId = s.StudentId,
-					StudentDetails = new StudentDTO
-					{
-						StudentName = s.StudentName,
-						StudentQualification = s.StudentQualification
-					}
-				})
-				.AsNoTracking()
-				.FirstOrDefaultAsync();
-		}
 
 		// Get total credits for completed enrollments
 		public async Task<int> GetCreditPointsAsync(string studentId)
@@ -111,7 +108,7 @@ namespace EduTrackAcademics.Repository
 		public async Task<(DateTime DueDate, string Type, string CourseName)?> GetAssignmentDetailsAsync(string courseId)
 		{
 			var result = await _context.Assessments
-				.Where(a => a.CourseId == courseId && a.Type == "Assignment")
+				.Where(a => a.CourseId == courseId)
 				.Join(_context.Course, a => a.CourseId, c => c.CourseId, (a, c)
 				=> new {
 					a.DueDate,
@@ -126,30 +123,6 @@ namespace EduTrackAcademics.Repository
 		}
 
 
-		//audit details
-		public async Task<AuditLogDTO?> GetStudentLoginHistoryAsync(string studentId)
-		{
-
-			var history = await _context.AuditLog
-				.Where(h => h.StudentId == studentId)
-				.OrderByDescending(h => h.LoginTime)
-				.FirstOrDefaultAsync();
-
-			if (history == null)
-				return null;
-
-			// Ensure LogoutTime is non-nullable for the DTO; fallback to LoginTime if missing
-			var logout = history.LogoutTime ?? history.LoginTime;
-
-			return new AuditLogDTO
-			{
-				Id = history.Id,
-				StudentId = history.StudentId,           // keep string type
-				LoginTime = history.LoginTime,
-				LogoutTime = logout,
-				TimeSpent = logout - history.LoginTime
-			};
-		}
 	}
 }
-	
+

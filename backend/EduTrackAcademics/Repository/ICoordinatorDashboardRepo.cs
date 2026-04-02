@@ -9,6 +9,7 @@ namespace EduTrackAcademics.Repository
 		IEnumerable<object> GetAcademicYears(string programId);
 		Course AddCourse(CourseDTO dto);
 		IEnumerable<object> GetCourses(string yearId);
+		IEnumerable<object> GetAllCourse();
 		IEnumerable<object> GetStudents(string qualification, string program, int year);
 		IEnumerable<object> GetInstructors(string skill);
 		IEnumerable<object> GetBatches(string program, int year);

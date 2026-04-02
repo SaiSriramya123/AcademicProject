@@ -52,6 +52,21 @@ namespace EduTrackAcademics.Service
 
 			return _repo.AddCourse(dto);
 		}
+		public IEnumerable<object> GetAllCourse()
+
+		{
+
+			var course = _repo.GetAllCourse();
+
+
+			if (course == null || !course.Any())
+
+				throw new CourseNotFoundException("Courses not found");
+
+
+			return course;
+
+		}
 
 		public IEnumerable<object> GetCourses(string yearId)
 		{

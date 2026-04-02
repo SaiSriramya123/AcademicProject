@@ -48,6 +48,13 @@ namespace EduTrackAcademics.Repository
 				.Select(c => new { c.CourseId, c.CourseName, c.Credits, c.DurationInWeeks })
 				.ToList();
 
+		public IEnumerable<object> GetAllCourse() =>_context.Course
+		.Select(c => new{
+		c.CourseId,
+		c.CourseName
+		})
+
+.ToList();
 		public IEnumerable<object> GetStudents(string qualification, string program, int year) =>
 			_context.Student
 				.Where(s =>

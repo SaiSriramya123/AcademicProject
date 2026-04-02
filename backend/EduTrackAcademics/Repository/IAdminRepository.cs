@@ -7,6 +7,7 @@ namespace EduTrackAcademics.Repository
 	{
 	
 			object AddQualification(QualificationDTO dto);
+		    IEnumerable<QualificationDTO> GetAllQualifications();
 			object AddProgram(ProgramDTO dto);
 			object AddAcademicYear(AcademicYearDTO dto);
 
