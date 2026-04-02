@@ -6,11 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace EduTrackAcademics.Migrations
 {
     /// <inheritdoc />
-<<<<<<<< HEAD:backend/EduTrackAcademics/Migrations/20260331122747_final2.cs
-    public partial class final2 : Migration
-========
-    public partial class ed : Migration
->>>>>>>> d799cb21c2ecb26743770440f266a9f061d9b050:backend/EduTrackAcademics/Migrations/20260402043200_ed.cs
+    public partial class final3 : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -20,13 +16,11 @@ namespace EduTrackAcademics.Migrations
                 columns: table => new
                 {
                     ReportId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    Course = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
+                    Scope = table.Column<string>(type: "nvarchar(50)", maxLength: 50, nullable: false),
                     CompletionRate = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
                     AvgScore = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
                     DropOutRate = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
-                    GeneratedDate = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    BatchAverageAttendance = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
-                    StudentAttendance = table.Column<decimal>(type: "decimal(5,2)", nullable: false)
+                    GeneratedDate = table.Column<DateTime>(type: "datetime2", nullable: false)
                 },
                 constraints: table =>
                 {
@@ -265,6 +259,30 @@ namespace EduTrackAcademics.Migrations
                         column: x => x.ProgramId,
                         principalTable: "Programs",
                         principalColumn: "ProgramId",
+                        onDelete: ReferentialAction.Cascade);
+                });
+
+            migrationBuilder.CreateTable(
+                name: "Performances",
+                columns: table => new
+                {
+                    ProgressID = table.Column<string>(type: "nvarchar(450)", nullable: false),
+                    EnrollmentId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CompletionPercentage = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
+                    LastUpdated = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    AvgScore = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
+                    BatchId = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    InstructorId = table.Column<int>(type: "int", nullable: false),
+                    StudentId = table.Column<string>(type: "nvarchar(450)", nullable: false)
+                },
+                constraints: table =>
+                {
+                    table.PrimaryKey("PK_Performances", x => x.ProgressID);
+                    table.ForeignKey(
+                        name: "FK_Performances_Student_StudentId",
+                        column: x => x.StudentId,
+                        principalTable: "Student",
+                        principalColumn: "StudentId",
                         onDelete: ReferentialAction.Cascade);
                 });
 
@@ -525,36 +543,6 @@ namespace EduTrackAcademics.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "Performances",
-                columns: table => new
-                {
-                    ProgressID = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    EnrollmentId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CompletionPercentage = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
-                    LastUpdated = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    AvgScore = table.Column<decimal>(type: "decimal(5,2)", nullable: false),
-                    BatchId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    InstructorId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    StudentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    courseBatchBatchId = table.Column<string>(type: "nvarchar(450)", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_Performances", x => x.ProgressID);
-                    table.ForeignKey(
-                        name: "FK_Performances_CourseBatches_courseBatchBatchId",
-                        column: x => x.courseBatchBatchId,
-                        principalTable: "CourseBatches",
-                        principalColumn: "BatchId");
-                    table.ForeignKey(
-                        name: "FK_Performances_Student_StudentId",
-                        column: x => x.StudentId,
-                        principalTable: "Student",
-                        principalColumn: "StudentId",
-                        onDelete: ReferentialAction.Cascade);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "StudentBatchAssignments",
                 columns: table => new
                 {
@@ -727,11 +715,6 @@ namespace EduTrackAcademics.Migrations
                 name: "IX_Modules_CourseId",
                 table: "Modules",
                 column: "CourseId");
-
-            migrationBuilder.CreateIndex(
-                name: "IX_Performances_courseBatchBatchId",
-                table: "Performances",
-                column: "courseBatchBatchId");
 
             migrationBuilder.CreateIndex(
                 name: "IX_Performances_StudentId",

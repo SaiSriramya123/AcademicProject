@@ -1,14 +1,12 @@
 import React from "react";
-import { Routes, Route } from "react-router-dom";
-import Dashboard from "./pages/Dashboard";
+
+import InstructorDashboard from "./components/InstructorDashboard";
 
 function App() {
-  return (
-    <Routes>
-      <Route path="/" element={<Dashboard />} />
-      {/* add more routes here */}
-    </Routes>
-  );
+
+  return <InstructorDashboard />;
+
 }
 
 export default App;
+ 
