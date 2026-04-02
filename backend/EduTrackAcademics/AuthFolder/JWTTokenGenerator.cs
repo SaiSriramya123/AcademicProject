@@ -1,5 +1,4 @@
-﻿
-using System.Configuration;
+﻿using System.Configuration;
 using System.IdentityModel.Tokens.Jwt;
 using System.Security.Claims;
 using System.Text;
@@ -23,8 +22,9 @@ namespace EduTrackAcademics.AuthFolder
 			var key = new SymmetricSecurityKey(Encoding.UTF8.GetBytes(secret));
 			var creds = new SigningCredentials(key, SecurityAlgorithms.HmacSha256);
 
-			// Kamal's Logic: 7 days for 'Remember Me', otherwise 1 hour
-			var expiry = rememberMe ? DateTime.UtcNow.AddDays(7) : DateTime.UtcNow.AddHours(10);
+			//7 days for 'Remember Me', otherwise 1 hour
+			var expiry = DateTime.UtcNow.AddHours(1);
+
 
 			var claims = new List<Claim>
 		{

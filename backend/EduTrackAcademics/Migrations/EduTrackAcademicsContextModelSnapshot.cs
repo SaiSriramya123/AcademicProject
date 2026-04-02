@@ -223,7 +223,8 @@ namespace EduTrackAcademics.Migrations
 
                     b.Property<string>("CoordinatorEmail")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(254)
+                        .HasColumnType("nvarchar(254)");
 
                     b.Property<int>("CoordinatorExperience")
                         .HasColumnType("int");
@@ -234,11 +235,13 @@ namespace EduTrackAcademics.Migrations
 
                     b.Property<string>("CoordinatorName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("CoordinatorPassword")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<long>("CoordinatorPhone")
                         .HasColumnType("bigint");
@@ -398,7 +401,8 @@ namespace EduTrackAcademics.Migrations
 
                     b.Property<string>("InstructorEmail")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(254)
+                        .HasColumnType("nvarchar(254)");
 
                     b.Property<int>("InstructorExperience")
                         .HasColumnType("int");
@@ -412,11 +416,13 @@ namespace EduTrackAcademics.Migrations
 
                     b.Property<string>("InstructorName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("InstructorPassword")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(200)
+                        .HasColumnType("nvarchar(200)");
 
                     b.Property<long>("InstructorPhone")
                         .HasColumnType("bigint");
@@ -427,7 +433,8 @@ namespace EduTrackAcademics.Migrations
 
                     b.Property<string>("InstructorSkills")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(500)
+                        .HasColumnType("nvarchar(500)");
 
                     b.Property<string>("ResumePath")
                         .IsRequired()
@@ -663,27 +670,31 @@ namespace EduTrackAcademics.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<DateTime>("StudentAcademicYear")
-                        .HasColumnType("datetime2");
+                    b.Property<DateOnly>("StudentAcademicYear")
+                        .HasColumnType("date");
 
                     b.Property<string>("StudentEmail")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(254)
+                        .HasColumnType("nvarchar(254)");
 
                     b.Property<string>("StudentGender")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(20)
+                        .HasColumnType("nvarchar(20)");
 
                     b.Property<string>("StudentName")
                         .IsRequired()
-                        .HasColumnType("nvarchar(max)");
+                        .HasMaxLength(100)
+                        .HasColumnType("nvarchar(100)");
 
                     b.Property<string>("StudentPassword")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<long>("StudentPhone")
-                        .HasColumnType("bigint");
+                    b.Property<string>("StudentPhone")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<string>("StudentProgram")
                         .IsRequired()
@@ -824,29 +835,6 @@ namespace EduTrackAcademics.Migrations
                     b.ToTable("StudentCourseAssignments");
                 });
 
-            modelBuilder.Entity("EduTrackAcademics.Model.StudentLoginHistory", b =>
-                {
-                    b.Property<int>("Id")
-                        .ValueGeneratedOnAdd()
-                        .HasColumnType("int");
-
-                    SqlServerPropertyBuilderExtensions.UseIdentityColumn(b.Property<int>("Id"));
-
-                    b.Property<DateTime>("LoginTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<DateTime?>("LogoutTime")
-                        .HasColumnType("datetime2");
-
-                    b.Property<string>("StudentId")
-                        .IsRequired()
-                        .HasColumnType("nvarchar(max)");
-
-                    b.HasKey("Id");
-
-                    b.ToTable("StudentLoginHistory");
-                });
-
             modelBuilder.Entity("EduTrackAcademics.Model.StudentProgress", b =>
                 {
                     b.Property<string>("ProgressID")
@@ -925,6 +913,12 @@ namespace EduTrackAcademics.Migrations
                     b.Property<string>("Password")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("RefreshToken")
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<DateTime?>("RefreshTokenExpiry")
+                        .HasColumnType("datetime2");
 
                     b.Property<string>("ResetToken")
                         .HasColumnType("nvarchar(max)");

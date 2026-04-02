@@ -5,6 +5,7 @@ namespace EduTrackAcademics.Services
 	public interface IAdminService
 	{
 		object AddQualification(QualificationDTO dto);
+		IEnumerable<QualificationDTO> GetAllQualifications();
 		object AddProgram(ProgramDTO dto);
 		object AddAcademicYear(AcademicYearDTO dto);
 

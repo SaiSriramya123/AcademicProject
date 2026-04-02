@@ -26,6 +26,12 @@ namespace EduTrackAcademics.Controllers
 			return Ok(result);
 		}
 
+		[HttpGet("GetAllqualification")]
+		public IActionResult GetAllQualification()
+		{
+			return Ok(_service.GetAllQualifications());
+		}
+
 		[HttpPost("program")]
 		public IActionResult AddProgram([FromBody] ProgramDTO dto)
 		{

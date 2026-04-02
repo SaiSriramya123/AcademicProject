@@ -1,39 +1,45 @@
-﻿using System.Threading.Tasks;
+﻿using System.Text.RegularExpressions;
+using EduTrackAcademics.Data;
 using EduTrackAcademics.DTO;
+using EduTrackAcademics.Exceptions;
 using EduTrackAcademics.Model;
 using EduTrackAcademics.Repository;
-using Microsoft.CodeAnalysis.Elfie.Serialization;
-using static System.Runtime.InteropServices.JavaScript.JSType;
-using static Microsoft.CodeAnalysis.CSharp.SyntaxTokenParser;
+using Microsoft.EntityFrameworkCore;
 
 namespace EduTrackAcademics.Services
 {
-	public static class PasswordHelper { 
-		public static string HashPassword(string password) { 
-			return BCrypt.Net.BCrypt.HashPassword(password); 
-		}
-		public static bool VerifyPassword(string password, string hashedPassword) { 
-			return BCrypt.Net.BCrypt.Verify(password, hashedPassword); 
-		} 
+	public static class PasswordHelper
+	{
+		public static string HashPassword(string password) => BCrypt.Net.BCrypt.HashPassword(password);
 	}
+
 	public class RegistrationService : IRegistrationService
 	{
+		private readonly EduTrackAcademicsContext _context;
 		private readonly IRegistrationRepository _repo;
 		private readonly IWebHostEnvironment _env;
 
-		public RegistrationService(IRegistrationRepository repo, IWebHostEnvironment env)
+		public RegistrationService(EduTrackAcademicsContext context, IRegistrationRepository repo, IWebHostEnvironment env)
 		{
+			_context = context;
 			_repo = repo;
 			_env = env;
 		}
 		public async Task RegisterStudentAsync(StudentDTO dto)
 		{
-			var hashedPassword = PasswordHelper.HashPassword(dto.StudentPassword);
+
+			if (!dto.StudentEmail.ToLower().EndsWith("@gmail.com"))
+				throw new InvalidEmailDomainException("Only @gmail.com addresses are allowed.");
+
+			var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.StudentEmail);
+
+			if (existingUser != null)
+				throw new EmailAlreadyRegisteredException("The Email already registered.");
 
 			var user = new Users
 			{
 				Email = dto.StudentEmail,
-				Password = hashedPassword,
+				Password = PasswordHelper.HashPassword(dto.StudentPassword),
 				Role = "Student"
 			};
 
@@ -43,27 +49,29 @@ namespace EduTrackAcademics.Services
 				StudentEmail = dto.StudentEmail,
 				StudentPhone = dto.StudentPhone,
 				StudentQualification = dto.StudentQualification,
-				StudentProgram = dto.StudentProgram,   
+				StudentProgram = dto.StudentProgram,
 				StudentAcademicYear = dto.StudentAcademicYear,
 				Year = dto.year,
 				StudentGender = dto.StudentGender,
-				StudentPassword = dto.StudentPassword
+				StudentPassword = dto.StudentPassword,
 			};
-
 
 			await _repo.RegisterStudentAsync(student, user);
 		}
+
 		public async Task RegisterInstructorAsync(InstructorDTO dto)
 		{
-			var hashedPassword = PasswordHelper.HashPassword(dto.InstructorPassword);
+			if (!dto.InstructorEmail.ToLower().EndsWith("@gmail.com"))
+				throw new InvalidEmailDomainException("Only @gmail.com addresses are allowed.");
+			var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.InstructorEmail);
+			if (existingUser != null)
+				throw new EmailAlreadyRegisteredException("The Email already registered.");
+
+			// --- YOUR ORIGINAL FILE UPLOAD LOGIC UNCHANGED ---
 			string folderName = "resumes";
 			string pathToSave = Path.Combine(_env.WebRootPath, folderName);
+			if (!Directory.Exists(pathToSave)) Directory.CreateDirectory(pathToSave);
 
-			// 2. Create directory if it doesn't exist
-			if (!Directory.Exists(pathToSave))
-				Directory.CreateDirectory(pathToSave);
-
-			// 3. Generate unique filename to prevent overwriting
 			string uniqueFileName = $"{Guid.NewGuid()}_{dto.InstructorResume.FileName}";
 			string fullPath = Path.Combine(pathToSave, uniqueFileName);
 
@@ -71,10 +79,12 @@ namespace EduTrackAcademics.Services
 			{
 				await dto.InstructorResume.CopyToAsync(stream);
 			}
+			// ------------------------------------------------
+
 			var user = new Users
 			{
 				Email = dto.InstructorEmail,
-				Password = hashedPassword,
+				Password = PasswordHelper.HashPassword(dto.InstructorPassword),
 				Role = "Instructor"
 			};
 
@@ -90,22 +100,21 @@ namespace EduTrackAcademics.Services
 				InstructorGender = dto.InstructorGender,
 				InstructorPassword = dto.InstructorPassword,
 				ResumePath = Path.Combine(folderName, uniqueFileName)
-
 			};
 
 			await _repo.RegisterInstructorAsync(instructor, user);
 		}
+
 		public async Task RegisterCoordinatorAsync(CoordinatorDTO dto)
 		{
-			var hashpassword = PasswordHelper.HashPassword(dto.CoordinatorPassword);
+			if (!dto.CoordinatorEmail.ToLower().EndsWith("@gmail.com"))
+				throw new InvalidEmailDomainException("Only @gmail.com addresses are allowed.");
+			var existingUser = await _context.Users.FirstOrDefaultAsync(u => u.Email == dto.CoordinatorEmail);
+			// --- YOUR ORIGINAL FILE UPLOAD LOGIC UNCHANGED ---
 			string folderName = "resumes";
 			string pathToSave = Path.Combine(_env.WebRootPath, folderName);
+			if (!Directory.Exists(pathToSave)) Directory.CreateDirectory(pathToSave);
 
-			// 2. Create directory if it doesn't exist
-			if (!Directory.Exists(pathToSave))
-				Directory.CreateDirectory(pathToSave);
-
-			// 3. Generate unique filename to prevent overwriting
 			string uniqueFileName = $"{Guid.NewGuid()}_{dto.Resumepath.FileName}";
 			string fullPath = Path.Combine(pathToSave, uniqueFileName);
 
@@ -113,10 +122,12 @@ namespace EduTrackAcademics.Services
 			{
 				await dto.Resumepath.CopyToAsync(stream);
 			}
+			// ------------------------------------------------
+
 			var user = new Users
 			{
 				Email = dto.CoordinatorEmail,
-				Password = hashpassword,
+				Password = PasswordHelper.HashPassword(dto.CoordinatorPassword),
 				Role = "Coordinator"
 			};
 
@@ -130,28 +141,9 @@ namespace EduTrackAcademics.Services
 				CoordinatorGender = dto.CoordinatorGender,
 				CoordinatorPassword = dto.CoordinatorPassword,
 				Resumepath = Path.Combine(folderName, uniqueFileName)
-
 			};
 
 			await _repo.RegisterCoordinatorAsync(coordinator, user);
 		}
-
 	}
 }
-
-//private readonly IRegistrationRepo _repo;
-
-//public RegistrationService(IRegistrationRepo repo)
-//{
-//	_repo = repo;
-//}
-
-//public List<Student> StuRegister(Student student)
-//{
-//	return _repo.StudentRegistration(student);
-//}
-
-//public List<Instructor> InsRegister(Instructor ins)
-//{
-//	return _repo.InstructorRegistration(ins);
-//}
