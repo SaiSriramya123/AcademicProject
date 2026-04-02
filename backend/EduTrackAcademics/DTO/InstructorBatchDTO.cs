@@ -9,8 +9,9 @@
             public string InstructorId { get; set; }
 
             public string CourseName { get; set; }
+        public int StudentCount { get; set; }
 
-        }
+    }
 
     
 }

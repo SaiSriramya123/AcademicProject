@@ -3,242 +3,279 @@ using EduTrackAcademics.DTO;
 using EduTrackAcademics.Dummy;
 using EduTrackAcademics.Exceptions;
 using EduTrackAcademics.Model;
+using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
+using System.Threading.Tasks;
+
 
 namespace EduTrackAcademics.Repository
+ 
 {
 
+   
+        public class AcademicReportRepository : IAcademicReportRepository
 
-	public class AcademicReportRepository : IAcademicReportRepository
+        {
 
-	{
+            private readonly EduTrackAcademicsContext _context;
 
-		private readonly EduTrackAcademicsContext _context;
-		public AcademicReportRepository(EduTrackAcademicsContext context)
+            private readonly IPerformanceRepository _performanceRepository;
 
-		{
-			_context = context;
+            public AcademicReportRepository(
 
-		}
+                EduTrackAcademicsContext context,
 
-		//method to get  batch reports
-		//public List<AcademicReport> GetReport()
+                IPerformanceRepository performanceRepository)
 
-		//{
+            {
 
-		//    var batches = _context.CourseBatches.ToList();
+                _context = context;
 
-		//    if (batches == null || batches.Count == 0)
+                _performanceRepository = performanceRepository;
 
-		//        throw new BatchNotFoundException("No batches available");
+            }
 
-		//    var reports = new List<AcademicReport>();
+            // ✅ SINGLE BATCH
 
-		//    foreach (var batch in batches)
+            public async Task<GetBatchReportDTO> GetBatchReport(string batchId)
 
-		//    {
+            {
 
-		//        // Get students in batch
+                var batch = await _context.CourseBatches
 
-		//        var studentIds = _context.StudentBatchAssignments
+                    .Include(b => b.Course)
 
-		//                            .Where(s => s.BatchId == batch.BatchId)
+                    .FirstOrDefaultAsync(b => b.BatchId == batchId);
 
-		//                            .Select(s => s.StudentId)
+                if (batch == null)
 
-		//                            .ToList();
+                    return null;
 
-		//        if (studentIds.Count == 0)
+                var perf = await _performanceRepository
 
-		//            continue;
+                    .GetBatchPerformanceAsync(batchId);
 
-		//        int totalStudents = studentIds.Count;
+                if (perf == null)
 
-		//        // Get performance records
+                    return null;
 
-		//        var performances = _context.Performances
+                var instructor = await _context.Instructor
 
-		//                            .Where(p => studentIds.Contains(p.StudentId))
+                    .FirstOrDefaultAsync(i => i.InstructorId == batch.InstructorId);
 
-		//                            .ToList();
+                int completed = perf.Students
 
-		//        int completedStudents = performances
+                    .Count(s => s.CompletionPercentage == 100);
 
-		//                                .Where(p => p.AvgScore >= 40)
+                var top = perf.Students
 
-		//                                .Count();
+                    .OrderByDescending(s => s.AvgScore)
 
-		//        decimal completionRate = totalStudents == 0
+                    .FirstOrDefault();
 
-		//            ? 0
+                var lastUpdated = perf.Students.Any()
 
-		//            : ((decimal)completedStudents / totalStudents) * 100;
+                    ? perf.Students.Max(s => s.LastUpdated)
 
-		//        decimal avgScore = performances.Count == 0
+                    : DateTime.Now;
 
-		//            ? 0
+                return new GetBatchReportDTO
 
-		//            : performances.Average(p => p.AvgScore);
+                {
 
-		//        int droppedStudents = totalStudents - completedStudents;
+                    BatchId = batch.BatchId,
 
-		//        decimal dropOutRate = totalStudents == 0
+                    CourseName = batch.Course.CourseName,
 
-		//            ? 0
+                    BatchAveragePercentage = perf.BatchAveragePercentage,
 
-		//            : ((decimal)droppedStudents / totalStudents) * 100;
+                    BatchAverageAttendance = perf.BatchAverageAttendance,
 
-		//        // Check if report already exists
+                    StudentAverageAttendence = perf.StudentAverageAttendence,
 
-		//        var existingReport = _context.AcademicReport
+                    Students = perf.Students,
 
-		//                                .FirstOrDefault(r => r.Scope == batch.BatchId);
+                    TotalStudents = perf.TotalStudents,
 
-		//        if (existingReport != null)
+                    BatchAverageScore = perf.BatchAverageScore,
 
-		//        {
+                    TopPerformer = top?.StudentName,
 
-		//            // UPDATE
+                    CompletedStudents = completed,
 
-		//            existingReport.CompletionRate = completionRate;
+                    LastUpdated = lastUpdated,
 
-		//            existingReport.AvgScore = avgScore;
+                    InstructorId = instructor?.InstructorId,
 
-		//            existingReport.DropOutRate = dropOutRate;
+                    InstructorName = instructor?.InstructorName,
 
-		//            existingReport.GeneratedDate = DateTime.Now;
 
-		//            reports.Add(existingReport);
+                };
 
-		//        }
+            }
 
-		//        else
+            // ✅ ALL BATCHES
 
-		//        {
+            public async Task<AcademicReportDTO> GetFullAcademicReport()
 
-		//            // INSERT
+            {
 
-		//            var newReport = new AcademicReport
+                var batches = await _context.CourseBatches
 
-		//            {
+                    .Include(b => b.Course)
 
-		//                ReportId = Guid.NewGuid().ToString(),
+                    .ToListAsync();
 
-		//                Scope = batch.BatchId,   // storing BatchId in Scope
+                var result = new List<GetBatchReportDTO>();
 
-		//                CompletionRate = completionRate,
+                foreach (var batch in batches)
 
-		//                AvgScore = avgScore,
+                {
 
-		//                DropOutRate = dropOutRate,
+                    var perf = await _performanceRepository
 
-		//                GeneratedDate = DateTime.Now
+                        .GetBatchPerformanceAsync(batch.BatchId);
 
-		//            };
+                    if (perf == null)
 
-		//            _context.AcademicReport.Add(newReport);
+                        continue;
 
-		//            reports.Add(newReport);
+                    var instructor = await _context.Instructor
 
-		//        }
+                        .FirstOrDefaultAsync(i => i.InstructorId == batch.InstructorId);
 
-		//    }
+                    int completed = perf.Students
 
-		//    _context.SaveChanges();
+                        .Count(s => s.CompletionPercentage == 100);
 
-		//    return reports;
+                    var top = perf.Students
 
-		//}
+                        .OrderByDescending(s => s.AvgScore)
 
-		//method to get single batch report 
+                        .FirstOrDefault();
 
-		public List<BatchAveragePerformanceDTO> GetAllBatchPerformanceReport()
-		{
-			var batches = _context.CourseBatches
-				.Include(b => b.Course)
-				.ToList();
+                    var lastUpdated = perf.Students.Any()
 
-			var result = new List<BatchAveragePerformanceDTO>();
-			foreach (var batch in batches)
-			{
-				// Get assessments for course
-				var assessments = _context.Assessments
-					.Where(a => a.CourseId == batch.CourseId)
-					.Select(a => new { a.AssessmentID, a.MaxMarks })
-					.ToList();
+                        ? perf.Students.Max(s => s.LastUpdated)
 
-				decimal totalMaxMarks = assessments.Sum(a => a.MaxMarks);
-				var assessmentIds = assessments.Select(a => a.AssessmentID).ToList();
+                        : DateTime.Now;
 
-				//  Get students in batch
-				var students = (from sba in _context.StudentBatchAssignments
-								join s in _context.Student on sba.StudentId equals s.StudentId
-								where sba.BatchId == batch.BatchId
-								select new
-								{
-									s.StudentId,
-									s.StudentName
-								}).ToList();
+                    result.Add(new GetBatchReportDTO
 
-				var studentResults = new List<BatchPerformanceDTO>();
-				var percentageList = new List<decimal>();
+                    {
 
-				foreach (var student in students)
-				{
-					var submissions = _context.Submissions
-						.Where(s => s.StudentID == student.StudentId &&
-									assessmentIds.Contains(s.AssessmentId))
-						.ToList();
+                        BatchId = batch.BatchId,
 
-					decimal totalScore = submissions.Sum(s => (decimal)s.Score);
-					decimal avgScore = submissions.Any() ? submissions.Average(s => (decimal)s.Score) : 0;
+                        CourseName = batch.Course.CourseName,
 
-					decimal percentage = totalMaxMarks > 0
-						? (totalScore / totalMaxMarks) * 100
-						: 0;
+                        BatchAveragePercentage = perf.BatchAveragePercentage,
 
-					DateTime? lastUpdated = submissions
-						.OrderByDescending(s => s.SubmissionDate)
-						.Select(s => (DateTime?)s.SubmissionDate)
-						.FirstOrDefault();
+                        BatchAverageAttendance = perf.BatchAverageAttendance,
 
-					percentageList.Add(percentage);
+                        StudentAverageAttendence = perf.StudentAverageAttendence,
 
-					studentResults.Add(new BatchPerformanceDTO
-					{
-						StudentId = student.StudentId,
-						StudentName = student.StudentName,
-						CourseName = batch.Course.CourseName,
-						TotalScore = totalScore,
-						AvgScore = avgScore,
-						CompletionPercentage = Math.Round(percentage, 2),
-						LastUpdated = lastUpdated
-					});
-				}
+                        Students = perf.Students,
 
-				decimal batchAveragePercentage = percentageList.Any()
-					? percentageList.Average()
-					: 0;
+                        TotalStudents = perf.TotalStudents,
 
-				result.Add(new BatchAveragePerformanceDTO
-				{
-					BatchId = batch.BatchId,
-					CourseName = batch.Course.CourseName,
-					BatchAveragePercentage = Math.Round(batchAveragePercentage, 2),
-					Students = studentResults
-				});
-			}
+                        BatchAverageScore = perf.BatchAverageScore,
 
-			return result;
-		}
+                        TopPerformer = top?.StudentName,
 
-	}
-}
+                        CompletedStudents = completed,
 
+                        LastUpdated = lastUpdated,
 
+                        InstructorId = instructor?.InstructorId,
 
+                        InstructorName = instructor?.InstructorName,
 
 
+                    });
 
+                }
 
+                return new AcademicReportDTO
 
+                {
+
+                    Batches = result
+
+                };
+
+            }
+
+            // 💾 SAVE / UPDATE
+
+            public async Task SaveOrUpdateAcademicReport(AcademicReportDTO dto)
+
+            {
+
+                foreach (var batch in dto.Batches)
+
+                {
+
+                    var existing = await _context.AcademicReport
+
+                        .FirstOrDefaultAsync(r => r.Course == batch.CourseName);
+
+                    if (existing != null)
+
+                    {
+
+                        // UPDATE
+
+                        existing.AvgScore = batch.BatchAverageScore;
+
+                        existing.CompletionRate = batch.BatchAveragePercentage;
+
+                        existing.BatchAverageAttendance = batch.BatchAverageAttendance;
+
+                        existing.StudentAttendance = batch.StudentAverageAttendence;
+
+                        existing.GeneratedDate = DateTime.Now;
+
+                    }
+
+                    else
+
+                    {
+
+                        // INSERT
+
+                        var report = new AcademicReport
+
+                        {
+
+                            ReportId = Guid.NewGuid().ToString(),
+
+                            Course = batch.CourseName,
+
+                            AvgScore = batch.BatchAverageScore,
+
+                            CompletionRate = batch.BatchAveragePercentage,
+
+                            BatchAverageAttendance = batch.BatchAverageAttendance,
+
+                            StudentAttendance = batch.StudentAverageAttendence,
+
+                            DropOutRate = 0,
+
+                            GeneratedDate = DateTime.Now
+
+                        };
+
+                        _context.AcademicReport.Add(report);
+
+                    }
+
+                }
+
+                await _context.SaveChangesAsync();
+
+            }
+
+        }
+
+    }
+ 

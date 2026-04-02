@@ -74,7 +74,7 @@ namespace EduTrackAcademics.Repository
 
 		public async Task<bool> IsAssessmentSubmittedAsync(String studentId, string assessmentId)
 		{
-			var exists = await _context.Submissions.AnyAsync(s => s.StudentID == studentId
+			var exists = await _context.Submission.AnyAsync(s => s.StudentID == studentId
 					&& s.AssessmentId == assessmentId);
 
 			if (exists)

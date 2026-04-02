@@ -1,6 +1,7 @@
 ﻿using EduTrackAcademics.Data;
 using EduTrackAcademics.Exceptions;
 using EduTrackAcademics.Services;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 [ApiController]
@@ -12,21 +13,30 @@ public class AcademicReportController : ControllerBase
     {
         _service = service;
     }
-    [HttpGet("get-single-report")]
-    public IActionResult GetAllBatchPerformanceReport()
+
+  //  [Authorize(Roles = "Coordinator, Admin")]
+    [HttpGet("get-batch-report")]
+
+    public async Task<IActionResult> GetBatchReport(string batchId)
+
     {
-        try
-        {
-            var result = _service.GetAllBatchPerformanceReport();
-            return Ok(result);
-        }
-        catch (BatchNotFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
-        catch (NoStudentsFoundException ex)
-        {
-            return NotFound(ex.Message);
-        }
+
+        var result = await _service.GetBatchReportAsync(batchId);
+
+        return Ok(result);
+    }
+    [HttpGet("full-report")]
+    public async Task<IActionResult> GetFullReport()
+    {
+        var result = await _service.GetFullAcademicReportAsync();
+        return Ok(result);
+    }
+    //  Generate + Save
+    [HttpPost("generate-and-save")]
+    public async Task<IActionResult> GenerateAndSaveReport()
+    {
+        var report = await _service.GetFullAcademicReportAsync();
+        await _service.SaveOrUpdateAcademicReportAsync(report);
+        return Ok(report);
     }
 }

@@ -148,7 +148,7 @@ namespace EduTrackAcademics.Repository
 
 		public async Task<Submission> GetSubmissionAsync(string studentId, string assessmentId)
 		{
-			return await _context.Submissions
+			return await _context.Submission
 				.FirstOrDefaultAsync(s =>
 					s.StudentID == studentId &&
 					s.AssessmentId == assessmentId);

@@ -12,7 +12,7 @@ namespace EduTrackAcademics.Dummy
    new AcademicReport
    {
        ReportId = "R101",
-       Scope = "Batch A",
+       Course = "Batch A",
        CompletionRate = 90.5m,
        AvgScore = 85.2m,
        DropOutRate = 5.3m,
@@ -21,7 +21,7 @@ namespace EduTrackAcademics.Dummy
    new AcademicReport
    {
        ReportId = "R102",
-       Scope = "Batch B",
+       Course = "Batch B",
        CompletionRate = 88.1m,
        AvgScore = 80.4m,
        DropOutRate = 6.5m,

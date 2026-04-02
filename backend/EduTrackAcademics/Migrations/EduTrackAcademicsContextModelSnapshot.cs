@@ -30,8 +30,16 @@ namespace EduTrackAcademics.Migrations
                     b.Property<decimal>("AvgScore")
                         .HasColumnType("decimal(5,2)");
 
+                    b.Property<decimal>("BatchAverageAttendance")
+                        .HasColumnType("decimal(5,2)");
+
                     b.Property<decimal>("CompletionRate")
                         .HasColumnType("decimal(5,2)");
+
+                    b.Property<string>("Course")
+                        .IsRequired()
+                        .HasMaxLength(50)
+                        .HasColumnType("nvarchar(50)");
 
                     b.Property<decimal>("DropOutRate")
                         .HasColumnType("decimal(5,2)");
@@ -39,10 +47,8 @@ namespace EduTrackAcademics.Migrations
                     b.Property<DateTime>("GeneratedDate")
                         .HasColumnType("datetime2");
 
-                    b.Property<string>("Scope")
-                        .IsRequired()
-                        .HasMaxLength(50)
-                        .HasColumnType("nvarchar(50)");
+                    b.Property<decimal>("StudentAttendance")
+                        .HasColumnType("decimal(5,2)");
 
                     b.HasKey("ReportId");
 
@@ -554,8 +560,9 @@ namespace EduTrackAcademics.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
-                    b.Property<int>("InstructorId")
-                        .HasColumnType("int");
+                    b.Property<string>("InstructorId")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
 
                     b.Property<DateTime>("LastUpdated")
                         .HasColumnType("datetime2");
@@ -564,9 +571,14 @@ namespace EduTrackAcademics.Migrations
                         .IsRequired()
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("courseBatchBatchId")
+                        .HasColumnType("nvarchar(450)");
+
                     b.HasKey("ProgressID");
 
                     b.HasIndex("StudentId");
+
+                    b.HasIndex("courseBatchBatchId");
 
                     b.ToTable("Performances");
                 });
@@ -1130,7 +1142,13 @@ namespace EduTrackAcademics.Migrations
                         .OnDelete(DeleteBehavior.Cascade)
                         .IsRequired();
 
+                    b.HasOne("EduTrackAcademics.Model.CourseBatch", "courseBatch")
+                        .WithMany()
+                        .HasForeignKey("courseBatchBatchId");
+
                     b.Navigation("Student");
+
+                    b.Navigation("courseBatch");
                 });
 
             modelBuilder.Entity("EduTrackAcademics.Model.ProgramEntity", b =>

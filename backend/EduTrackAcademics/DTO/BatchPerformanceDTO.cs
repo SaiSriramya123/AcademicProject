@@ -8,10 +8,13 @@
         public int Marks { get; set; }
         public decimal AvgScore { get; set; }
         public decimal TotalScore { get; set; }
+        public string InstructorId { get; set; }
+        public string BatchId { get; set; }
+        public string EnrollmentId { get; set; }
 
         public decimal CompletionPercentage { get; set; }
         public DateTime? LastUpdated { get; set; }
-        
+
 
     }
 }

@@ -1,6 +1,6 @@
 ﻿using EduTrackAcademics.DTO;
 
-public class BatchAveragePerformanceDTO
+public class BatchAveragePercentageDTO
 {
 	public string BatchId { get; set; }
 	public string CourseName { get; set; }

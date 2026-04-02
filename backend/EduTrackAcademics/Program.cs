@@ -116,10 +116,11 @@ builder.Services.AddScoped<IAdminService, AdminService>();
 builder.Services.AddCors(options =>
 {
 	options.AddPolicy("MyCorsPolicy", builder => builder
-		.WithOrigins("http://localhost:5173")
+		.WithOrigins("http://localhost:5174")
 		.AllowAnyMethod()
 		.AllowCredentials()
 		.WithHeaders("Accept", "Content-Type", "Origin", "X-My-Header"));
+
 });
 
 var app = builder.Build();

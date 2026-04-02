@@ -7,6 +7,10 @@
 		public string CourseName { get; set; }
 		public decimal TotalScore { get; set; }
 		public decimal AverageScore { get; set; }
-		public decimal Percentage { get; set; }
-	}
+		public decimal CompletionPercentage { get; set; }
+		public int TotalAssessments { get; set; }
+		public int CompletedAssessments { get; set; }
+		public  decimal AssessmentPercentage{ get; set; }
+
+    }
 }

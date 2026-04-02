@@ -24,5 +24,9 @@ namespace EduTrackAcademics.DTO
 
 		[Required]
 		public string StudentPassword { get; set; }
-	}
+		public string StudentId { get; set; }	
+		public decimal AverageScore { get; set; }	
+		public decimal AttendancePercentage { get; set; }
+		public decimal CompletionPercentage { get; set; }
+    }
 }
