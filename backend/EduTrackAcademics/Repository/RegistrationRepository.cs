@@ -1,15 +1,14 @@
 ﻿using EduTrackAcademics.Data;
 using EduTrackAcademics.Exceptions;
 using EduTrackAcademics.Model;
-using Microsoft.AspNetCore.Identity;
-using Microsoft.VisualStudio.Web.CodeGenerators.Mvc.Templates.BlazorIdentity.Pages.Manage;
+using Microsoft.EntityFrameworkCore;
 
 namespace EduTrackAcademics.Repository
 {
 	public class RegistrationRepository : IRegistrationRepository
 	{
 		private readonly EduTrackAcademicsContext _context;
-		
+
 		public RegistrationRepository(EduTrackAcademicsContext context)
 		{
 			_context = context;
@@ -17,89 +16,77 @@ namespace EduTrackAcademics.Repository
 
 		public async Task RegisterStudentAsync(Student student, Users user)
 		{
-			var email = user.Email;
+			//await ValidateEmail(user.Email);
 
-			if (!email.ToLower().EndsWith("@gmail.com"))
-				throw new InvalidEmailDomainException("Only @gmail.com addresses are allowed.");
-			// Duplicate email rule 
-			if (_context.Users.Any(u => u.Email == email))
-				throw new EmailAlreadyRegisteredException("Email already registered.");
+			using var transaction = await _context.Database.BeginTransactionAsync();
+			try
+			{
+				_context.Users.Add(user);
+				await _context.SaveChangesAsync();
 
-			_context.Users.Add(user);
-			await _context.SaveChangesAsync();
+				student.UserId = user.UserId;
+				student.StudentId = $"S{(_context.Student.Count() + 1):D3}";
 
-			student.UserId = user.UserId;
-			student.StudentId = GenerateStudentId(); // assign custom ID
+				_context.Student.Add(student);
+				await _context.SaveChangesAsync();
 
-			_context.Student.Add(student);
-			await _context.SaveChangesAsync();
-		}
-
-		public string GenerateStudentId()
-		{
-			int count = _context.Student.Count();
-			return $"S{(count + 1):D3}";
-		}
-		public string GenerateInstructorId()
-		{
-			int count = _context.Instructor.Count();
-			return $"I{(count + 1):D3}";
+				await transaction.CommitAsync();
+			}
+			catch
+			{
+				await transaction.RollbackAsync();
+				throw;
+			}
 		}
 
 		public async Task RegisterInstructorAsync(Instructor instructor, Users user)
 		{
-			var email = user.Email;
+			//await ValidateEmail(user.Email);
 
-			if (!email.ToLower().EndsWith("@gmail.com"))
-				throw new InvalidEmailDomainException("Only @gmail.com addresses are allowed.");
-			// Duplicate email rule 
-			if (_context.Users.Any(u => u.Email == email))
-				throw new EmailAlreadyRegisteredException("Email already registered.");
+			using var transaction = await _context.Database.BeginTransactionAsync();
+			try
+			{
+				_context.Users.Add(user);
+				await _context.SaveChangesAsync();
 
-			// Save User first
-			_context.Users.Add(user);
-			await _context.SaveChangesAsync();
+				instructor.UserId = user.UserId;
+				instructor.InstructorId = $"I{(_context.Instructor.Count() + 1):D3}";
 
-			// Assign generated UserId to Instructor
-			instructor.UserId = user.UserId;
+				_context.Instructor.Add(instructor);
+				await _context.SaveChangesAsync();
 
-			//add the generated id
-			instructor.InstructorId = GenerateInstructorId(); // assign custom ID
-
-			// Save Instructor record
-			_context.Instructor.Add(instructor);
-			await _context.SaveChangesAsync();
-		}
-
-		public string GenerateCoordinatorId()
-		{
-			int count = _context.Coordinator.Count();
-			return $"C{(count + 1):D3}";
+				await transaction.CommitAsync();
+			}
+			catch
+			{
+				await transaction.RollbackAsync();
+				throw;
+			}
 		}
 
 		public async Task RegisterCoordinatorAsync(Coordinator coordinator, Users user)
-		{	
+		{
+			//await ValidateEmail(user.Email);
 
-			var email = user.Email;
-			if (!email.ToLower().EndsWith("@gmail.com"))
-				throw new InvalidEmailDomainException("Only @gmail.com addresses are allowed.");
-			// Duplicate email rule 
-			if (_context.Users.Any(u => u.Email == email))
-				throw new EmailAlreadyRegisteredException("Email already registered.");
+			using var transaction = await _context.Database.BeginTransactionAsync();
+			try
+			{
+				_context.Users.Add(user);
+				await _context.SaveChangesAsync();
 
-			_context.Users.Add(user);
-			await _context.SaveChangesAsync();
+				coordinator.UserId = user.UserId;
+				coordinator.CoordinatorId = $"C{(_context.Coordinator.Count() + 1):D3}";
 
-			// 2. Assign the Foreign Key (The auto-generated Int from Users)
-			coordinator.UserId = user.UserId;
+				_context.Coordinator.Add(coordinator);
+				await _context.SaveChangesAsync();
 
-			
-			// You were missing this or assigning it to the wrong property
-			coordinator.CoordinatorId = GenerateCoordinatorId();
-
-			// 4. Save Coordinator record
-			_context.Coordinator.Add(coordinator);
-			await _context.SaveChangesAsync();
-		}	
+				await transaction.CommitAsync();
+			}
+			catch
+			{
+				await transaction.RollbackAsync();
+				throw;
+			}
+		}
 	}
 }

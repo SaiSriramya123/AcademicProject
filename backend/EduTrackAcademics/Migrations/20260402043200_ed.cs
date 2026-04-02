@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace EduTrackAcademics.Migrations
 {
     /// <inheritdoc />
-    public partial class info : Migration
+    public partial class ed : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -88,21 +88,6 @@ namespace EduTrackAcademics.Migrations
                 });
 
             migrationBuilder.CreateTable(
-                name: "StudentLoginHistory",
-                columns: table => new
-                {
-                    Id = table.Column<int>(type: "int", nullable: false)
-                        .Annotation("SqlServer:Identity", "1, 1"),
-                    StudentId = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    LoginTime = table.Column<DateTime>(type: "datetime2", nullable: false),
-                    LogoutTime = table.Column<DateTime>(type: "datetime2", nullable: true)
-                },
-                constraints: table =>
-                {
-                    table.PrimaryKey("PK_StudentLoginHistory", x => x.Id);
-                });
-
-            migrationBuilder.CreateTable(
                 name: "StudentProgress",
                 columns: table => new
                 {
@@ -143,11 +128,13 @@ namespace EduTrackAcademics.Migrations
                     Email = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Password = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    ResetToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    ResetTokenExpiry = table.Column<DateTime>(type: "datetime2", nullable: true),
                     IsEmailVerified = table.Column<bool>(type: "bit", nullable: false),
                     VerificationOtp = table.Column<string>(type: "nvarchar(max)", nullable: true),
-                    OtpExpiry = table.Column<DateTime>(type: "datetime2", nullable: true)
+                    OtpExpiry = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    ResetToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    ResetTokenExpiry = table.Column<DateTime>(type: "datetime2", nullable: true),
+                    RefreshToken = table.Column<string>(type: "nvarchar(max)", nullable: true),
+                    RefreshTokenExpiry = table.Column<DateTime>(type: "datetime2", nullable: true)
                 },
                 constraints: table =>
                 {
@@ -179,15 +166,15 @@ namespace EduTrackAcademics.Migrations
                 {
                     CoordinatorId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: true),
-                    CoordinatorName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CoordinatorEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CoordinatorName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    CoordinatorEmail = table.Column<string>(type: "nvarchar(254)", maxLength: 254, nullable: false),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CoordinatorPhone = table.Column<long>(type: "bigint", nullable: false),
                     CoordinatorQualification = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     CoordinatorExperience = table.Column<int>(type: "int", nullable: false),
                     CoordinatorGender = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     Resumepath = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    CoordinatorPassword = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    CoordinatorPassword = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     IsFirstLogin = table.Column<bool>(type: "bit", nullable: false),
                     IsActive = table.Column<bool>(type: "bit", nullable: false)
                 },
@@ -207,16 +194,16 @@ namespace EduTrackAcademics.Migrations
                 {
                     InstructorId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: true),
-                    InstructorName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    InstructorEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    InstructorName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    InstructorEmail = table.Column<string>(type: "nvarchar(254)", maxLength: 254, nullable: false),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     InstructorPhone = table.Column<long>(type: "bigint", nullable: false),
                     InstructorQualification = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    InstructorSkills = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    InstructorSkills = table.Column<string>(type: "nvarchar(500)", maxLength: 500, nullable: false),
                     InstructorExperience = table.Column<int>(type: "int", nullable: false),
                     InstructorJoinDate = table.Column<DateOnly>(type: "date", nullable: false),
                     InstructorGender = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    InstructorPassword = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    InstructorPassword = table.Column<string>(type: "nvarchar(200)", maxLength: 200, nullable: false),
                     ResumePath = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -235,15 +222,15 @@ namespace EduTrackAcademics.Migrations
                 {
                     StudentId = table.Column<string>(type: "nvarchar(450)", nullable: false),
                     UserId = table.Column<int>(type: "int", nullable: true),
-                    StudentName = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    StudentEmail = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StudentName = table.Column<string>(type: "nvarchar(100)", maxLength: 100, nullable: false),
+                    StudentEmail = table.Column<string>(type: "nvarchar(254)", maxLength: 254, nullable: false),
                     Role = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    StudentPhone = table.Column<long>(type: "bigint", nullable: false),
+                    StudentPhone = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StudentQualification = table.Column<string>(type: "nvarchar(max)", nullable: false),
                     StudentProgram = table.Column<string>(type: "nvarchar(max)", nullable: false),
-                    StudentAcademicYear = table.Column<DateTime>(type: "datetime2", nullable: false),
+                    StudentAcademicYear = table.Column<DateOnly>(type: "date", nullable: false),
                     Year = table.Column<int>(type: "int", nullable: false),
-                    StudentGender = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    StudentGender = table.Column<string>(type: "nvarchar(20)", maxLength: 20, nullable: false),
                     StudentPassword = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
@@ -637,8 +624,8 @@ namespace EduTrackAcademics.Migrations
 
             migrationBuilder.InsertData(
                 table: "Users",
-                columns: new[] { "UserId", "Email", "IsEmailVerified", "OtpExpiry", "Password", "ResetToken", "ResetTokenExpiry", "Role", "VerificationOtp" },
-                values: new object[] { 1, "admin@gmail.com", true, null, "$2a$12$zQYc9Zkz5PxyDZ0GmJ3q6Oc0Q4r1Uju9rG0q3JcPlzLzF8qfGZpMe", null, null, "Admin", null });
+                columns: new[] { "UserId", "Email", "IsEmailVerified", "OtpExpiry", "Password", "RefreshToken", "RefreshTokenExpiry", "ResetToken", "ResetTokenExpiry", "Role", "VerificationOtp" },
+                values: new object[] { 1, "admin@gmail.com", true, null, "$2a$12$zQYc9Zkz5PxyDZ0GmJ3q6Oc0Q4r1Uju9rG0q3JcPlzLzF8qfGZpMe", null, null, null, null, "Admin", null });
 
             migrationBuilder.CreateIndex(
                 name: "IX_AcademicYear_ProgramId",
@@ -818,9 +805,6 @@ namespace EduTrackAcademics.Migrations
 
             migrationBuilder.DropTable(
                 name: "StudentCourseAssignments");
-
-            migrationBuilder.DropTable(
-                name: "StudentLoginHistory");
 
             migrationBuilder.DropTable(
                 name: "StudentProgress");

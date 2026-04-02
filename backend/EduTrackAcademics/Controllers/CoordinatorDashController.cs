@@ -39,6 +39,13 @@ namespace EduTrackAcademics.Controllers
 		{
 			return Ok(_service.AddCourse(dto));
 		}
+
+		[HttpGet("GetAllCOURSES")]
+		public IActionResult GetAllCourse()
+		{
+			return Ok(_service.GetAllCourse());
+		}
+
 		[Authorize(Roles = "Coordinator")]
 		[HttpPut("course/{id}")]
 		public IActionResult UpdateCourse(string id, [FromBody] CourseDTO dto)

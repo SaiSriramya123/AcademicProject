@@ -1,8 +1,9 @@
-﻿using EduTrackAcademics.Exceptions;
+﻿using EduTrackAcademics.DTO;
+using EduTrackAcademics.Exceptions;
+using EduTrackAcademics.Model;
 using EduTrackAcademics.Repository;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
-using EduTrackAcademics.DTO;
-
 namespace EduTrackAcademics.Services
 {
 	public class StudentProfileService : IStudentProfileService
@@ -12,9 +13,22 @@ namespace EduTrackAcademics.Services
 		{
 			_repo = repo;
 		}
+
+		public async Task<List<StudentDTO>> GetAllStudentsAsync()
+		{
+			var result = await _repo.GetAllStudentsAsync();
+
+			if (result == null || !result.Any())
+			{
+				throw new StudentNotFoundException("No students found");
+			}
+			return result;
+		}
+
 		public async Task<StudentDTO> GetPersonalInfoAsync(string studentId)
 		{
 			var result = await _repo.GetPersonalInfoAsync(studentId);
+
 			if (result == null)
 				throw new StudentNotFoundException("Student not found");
 			return result;
@@ -22,6 +36,7 @@ namespace EduTrackAcademics.Services
 		public async Task<StudentDTO> GetProgramDetails(string studentId)
 		{
 			var result = await _repo.GetProgramDetailsAsync(studentId);
+
 			if (result == null)
 				throw new StudentNotFoundException("Student not found");
 			return result;
@@ -29,25 +44,12 @@ namespace EduTrackAcademics.Services
 		public async Task UpdateAdditionalInfo(string studentId, StudentAdditionalDetailsDTO dto)
 		{
 			var exists = await _repo.StudentExistsAsync(studentId);
+
 			if (!exists)
 				throw new StudentNotFoundException("Student not found");
 			await _repo.UpdateAdditionalInfoAsync(studentId, dto);
 		}
-		private async Task ValidateStudent(string studentId)
-		{
-			var exists = await _repo.StudentExistsAsync(studentId);
-			if (!exists)
-				throw new StudentNotFoundException(studentId);
-		}
-		public async Task<StudentDTO> GetStudentDetails(string studentId)
-		{
-			await ValidateStudent(studentId);
-			// Repository returns StudentDashboardDTO; extract inner StudentDTO
-			var dashboardResult = await _repo.GetStudentDetailsAsync(studentId);
-			if (dashboardResult == null || dashboardResult.StudentDetails == null)
-				throw new StudentNotFoundException(studentId);
-			return dashboardResult.StudentDetails;
-		}
+
 		public async Task<int> GetCreditPointsAsync(string studentId)
 		{
 			// Validate student existence
@@ -75,21 +77,12 @@ namespace EduTrackAcademics.Services
 			} // Fetch assignment details
 
 			var assignment = await _repo.GetAssignmentDetailsAsync(courseId);
+
 			if (assignment == null)
 			{
 				throw new InvalidOperationException($"No assignment found for course {courseId}.");
 			}
 			return assignment.Value;
-		}
-
-		public async Task<AuditLogDTO> GetAuditLogAsync(string studentId)
-		{
-			var log = await _repo.GetStudentLoginHistoryAsync(studentId);
-			if (log == null)
-			{
-				throw new ArgumentException($"No login history found for student {studentId}.");
-			}
-			return log;
 		}
 
 	}
