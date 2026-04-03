@@ -603,7 +603,19 @@ namespace EduTrackAcademics.Migrations
                     b.Property<string>("QualificationId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("QualificationDescription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("QualificationName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("QualificationYears")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Qualificationsh")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 

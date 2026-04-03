@@ -6,7 +6,7 @@ using Microsoft.EntityFrameworkCore.Migrations;
 namespace EduTrackAcademics.Migrations
 {
     /// <inheritdoc />
-    public partial class ed : Migration
+    public partial class edtr : Migration
     {
         /// <inheritdoc />
         protected override void Up(MigrationBuilder migrationBuilder)
@@ -64,7 +64,10 @@ namespace EduTrackAcademics.Migrations
                 columns: table => new
                 {
                     QualificationId = table.Column<string>(type: "nvarchar(450)", nullable: false),
-                    QualificationName = table.Column<string>(type: "nvarchar(max)", nullable: false)
+                    QualificationName = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    Qualificationsh = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    QualificationYears = table.Column<string>(type: "nvarchar(max)", nullable: false),
+                    QualificationDescription = table.Column<string>(type: "nvarchar(max)", nullable: false)
                 },
                 constraints: table =>
                 {

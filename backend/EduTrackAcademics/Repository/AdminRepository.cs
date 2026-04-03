@@ -2,6 +2,7 @@
 using EduTrackAcademics.DTO;
 using EduTrackAcademics.Model;
 using EduTrackAcademics.Services;
+using Humanizer;
 
 namespace EduTrackAcademics.Repository
 {
@@ -21,7 +22,10 @@ namespace EduTrackAcademics.Repository
 			var qualification = new Qualification
 			{
 				QualificationId = _idService.GenerateQualificationId(),
-				QualificationName = dto.QualificationName
+				QualificationName = dto.QualificationName,
+				Qualificationsh = dto.Qualificationsh,
+				QualificationYears = dto.QualificationYears,
+				QualificationDescription = dto.QualificationDescription
 			};
 
 			_context.Qualification.Add(qualification);
@@ -35,7 +39,10 @@ namespace EduTrackAcademics.Repository
 			return _context.Qualification
 				.Select(q => new QualificationDTO
 				{
-					QualificationName = q.QualificationName
+					QualificationName = q.QualificationName,
+					Qualificationsh = q.Qualificationsh,
+					QualificationYears = q.QualificationYears,
+					QualificationDescription = q.QualificationDescription
 
 				})
 				.ToList();

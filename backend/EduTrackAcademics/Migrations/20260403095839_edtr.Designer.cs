@@ -12,8 +12,8 @@ using Microsoft.EntityFrameworkCore.Storage.ValueConversion;
 namespace EduTrackAcademics.Migrations
 {
     [DbContext(typeof(EduTrackAcademicsContext))]
-    [Migration("20260402043200_ed")]
-    partial class ed
+    [Migration("20260403095839_edtr")]
+    partial class edtr
     {
         /// <inheritdoc />
         protected override void BuildTargetModel(ModelBuilder modelBuilder)
@@ -606,7 +606,19 @@ namespace EduTrackAcademics.Migrations
                     b.Property<string>("QualificationId")
                         .HasColumnType("nvarchar(450)");
 
+                    b.Property<string>("QualificationDescription")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
                     b.Property<string>("QualificationName")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("QualificationYears")
+                        .IsRequired()
+                        .HasColumnType("nvarchar(max)");
+
+                    b.Property<string>("Qualificationsh")
                         .IsRequired()
                         .HasColumnType("nvarchar(max)");
 
